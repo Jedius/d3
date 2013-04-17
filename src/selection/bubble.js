@@ -20,7 +20,6 @@ d3_selectionPrototype.overlap = function(nodes,opacity) {
 	if (typeof opacity === 'number') {
 		var clone = this.node().parentNode.insertBefore(this.node().cloneNode(true), nodes[0][nodes[0].length-1]);
 		d3.select(clone).style('opacity',opacity);
-	  return this;
 	}
-
+	return this;
 };

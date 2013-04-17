@@ -50,6 +50,7 @@ import "empty";
 import "node";
 import "enter";
 import "transition";
+import "bubble";
 
 var d3_selectionRoot = d3_selection([[d3_document]]);
 

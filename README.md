@@ -1,7 +1,30 @@
-# Data-Driven Documents
+# D3 fork
+all changes in src/selection/bubble.js
 
-**D3.js** is a JavaScript library for manipulating documents based on data. **D3** helps you bring data to life using HTML, SVG and CSS. D3’s emphasis on web standards gives you the full capabilities of modern browsers without tying yourself to a proprietary framework, combining powerful visualization components and a data-driven approach to DOM manipulation.
+# Overlapping areas visualisation 
+https://gist.github.com/Jedius/5419480
+```
 
-Want to learn more? [See the wiki.](https://github.com/mbostock/d3/wiki)
+d3.select('.line')
+	.strokeWidth(5) // set stroke width
+	.strokeColor('aqua') // set stroke color
 
-For examples, [see the gallery](https://github.com/mbostock/d3/wiki/Gallery) and [mbostock’s bl.ocks](http://bl.ocks.org/mbostock).
+d3.select('.area')
+	.fill('green') // set area color
+	.fillOpacity(0.8) // set area opacity
+
+// overlap elements
+allElements = svg.selectAll(".element");
+curElement = svg.select(".element:nth-child(3)")
+opacity = 0.8
+curElement.overlap(allElements,opacity) // if opacity not set, element will be on bottom position
+
+// set background color
+d3.select('svg').bColor('aqua');
+
+d3.selectAll('text')
+	.font('Arial') // set font-family
+	.fontSize('10px') // set font-size
+	.fill('green') // set font color
+
+```

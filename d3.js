@@ -1149,10 +1149,6 @@ d3 = function() {
     this.style("font-size", size);
     return this;
   };
-  d3_selectionPrototype.color = function(color) {
-    this.style("color", color);
-    return this;
-  };
   d3_selectionPrototype.position = function(x, y) {
     this.attr("transform", "translate(" + x + "," + y + ")");
     return this;

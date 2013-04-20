@@ -1104,21 +1104,29 @@ d3 = function() {
     this.style("fill-opacity", opacity);
     return this;
   };
-  d3_selectionPrototype.overlap = function(nodes, opacity) {
-    var index = nodes[0].indexOf(this.node());
-    if (index !== -1) {
-      nodes[0].splice(index, 1);
-      nodes[0].unshift(this.node());
-      nodes.order();
-    }
-    if (typeof opacity === "number") {
-      var parent = this.node().parentNode;
-      var cur = this.node().cloneNode(true);
-      var temp = d3.select(parent).append("temp");
-      var clone = parent.insertBefore(cur, temp);
-      temp.remove();
-      this.cloneOverlap = d3.select(clone);
-      this.cloneOverlap.style("opacity", opacity);
+  d3_selectionPrototype.overlap = function(opacity) {
+    if (this[0].length > 1) {
+      this.each(function() {
+        d3.select(this).overlap(opacity);
+      });
+    } else {
+      var nodes = d3.selectAll(this.node().parentNode.childNodes);
+      var index = nodes[0].indexOf(this.node());
+      if (index !== -1) {
+        nodes[0].splice(index, 1);
+        nodes[0].unshift(this.node());
+        nodes.order();
+      }
+      if (typeof opacity === "number") {
+        var parent = this.node().parentNode;
+        var cur = this.node().cloneNode(true);
+        var temp = d3.select(parent).append("temp");
+        var clone = parent.insertBefore(cur, temp);
+        temp.remove();
+        this.node().clone = d3.select(clone).style("opacity", opacity).classed("overlap-clone", true);
+      } else if (typeof opacity === "boolean" && opacity === false) {
+        this.node().clone.remove();
+      }
     }
     return this;
   };
@@ -1147,6 +1155,28 @@ d3 = function() {
   };
   d3_selectionPrototype.fontSize = function(size) {
     this.style("font-size", size);
+    return this;
+  };
+  d3_selectionPrototype.move = function(dx, dy) {
+    if (typeof dx !== "undefined") {
+      this.attr("dx", dx);
+    }
+    if (typeof dy !== "undefined") {
+      this.attr("dy", dy);
+    }
+    return this;
+  };
+  d3_selectionPrototype.collapse = function(percent) {
+    this.attr("transform", function(d) {
+      if (typeof percent === "number") {
+        x = d.x * percent;
+        y = d.x * percent;
+      } else {
+        x = 0;
+        y = 0;
+      }
+      return "translate(" + (d.x - x) + "," + (d.y - y) + ")";
+    });
     return this;
   };
   d3_selectionPrototype.position = function(x, y) {

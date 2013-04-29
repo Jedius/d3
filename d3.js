@@ -1088,26 +1088,117 @@ d3 = function() {
     }
     return d3_transition(subgroups, id);
   };
-  d3_selectionPrototype.strokeWidth = function(width) {
-    this.style("stroke-width", width);
+  var style = function(nodes, fn, style, arg) {
+    if (typeof arg === "undefined") {
+      arg = style;
+      style = null;
+    }
+    if (typeof arg === "object") {
+      var i = 0;
+      nodes.each(function() {
+        if (arg[i]) {
+          if (style !== null) {
+            d3.select(this)[fn](style, arg[i]);
+          } else {
+            d3.select(this)[fn](arg[i]);
+          }
+          i++;
+        }
+      });
+    } else {
+      nodes.style(style, arg);
+    }
+  };
+  d3_selectionPrototype.strokeWidth = function(arg) {
+    style(this, "style", "stroke-width", arg);
     return this;
   };
-  d3_selectionPrototype.strokeColor = function(color) {
-    this.style("stroke", color);
+  d3_selectionPrototype.strokeColor = function(arg) {
+    style(this, "style", "stroke", arg);
     return this;
   };
-  d3_selectionPrototype.fill = function(color) {
-    this.style("fill", color);
+  d3_selectionPrototype.fill = function(arg) {
+    style(this, "style", "fill", arg);
     return this;
   };
-  d3_selectionPrototype.fillOpacity = function(opacity) {
-    this.style("fill-opacity", opacity);
+  d3_selectionPrototype.fillOpacity = function(arg) {
+    style(this, "style", "fill-opacity", arg);
+    return this;
+  };
+  d3_selectionPrototype.bColor = function(arg) {
+    style(this, "style", "background-color", arg);
+    return this;
+  };
+  d3_selectionPrototype.font = function(arg) {
+    style(this, "style", "font-family", arg);
+    return this;
+  };
+  d3_selectionPrototype.fontSize = function(arg) {
+    style(this, "style", "font-size", arg);
+    return this;
+  };
+  d3_selectionPrototype.hide = function() {
+    if (this.style("display") !== "none") {
+      this._styleDisplay = this.style("display");
+    }
+    style(this, "style", "display", "none");
+    return this;
+  };
+  d3_selectionPrototype.show = function() {
+    if (this._styleDisplay && this._styleDisplay !== "none") {
+      style(this, "style", "display", this._styleDisplay);
+    } else {
+      style(this, "style", "display", "inline");
+    }
+    return this;
+  };
+  d3_selectionPrototype.label = function(arg) {
+    style(this, "text", arg);
+    return this;
+  };
+  d3_selectionPrototype.position = function(arg) {
+    if (typeof arg === "object") {
+      for (var i = 0; i < arg.length; i++) {
+        arg[i] = "translate(" + arg[i][0] + "," + arg[i][1] + ")";
+      }
+    }
+    style(this, "attr", "transform", arg);
+    return this;
+  };
+  d3_selectionPrototype.move = function(dx, dy) {
+    if (typeof dx !== "undefined") {
+      style(this, "attr", "dx", dx);
+    }
+    if (typeof dy !== "undefined") {
+      style(this, "attr", "dy", dy);
+    }
+    return this;
+  };
+  d3_selectionPrototype.collapse = function(percent) {
+    this.attr("transform", function(d) {
+      if (typeof percent === "number") {
+        x = d.x * percent;
+        y = d.x * percent;
+      } else {
+        x = 0;
+        y = 0;
+      }
+      return "translate(" + (d.x - x) + "," + (d.y - y) + ")";
+    });
     return this;
   };
   d3_selectionPrototype.overlap = function(opacity) {
     if (this[0].length > 1) {
+      var i = 0;
       this.each(function() {
-        d3.select(this).overlap(opacity);
+        if (typeof opacity === "object") {
+          if (typeof opacity[i] !== "undefined") {
+            d3.select(this).overlap(opacity[i]);
+            i++;
+          }
+        } else {
+          d3.select(this).overlap(opacity);
+        }
       });
     } else {
       var nodes = d3.selectAll(this.node().parentNode.childNodes);
@@ -1128,59 +1219,6 @@ d3 = function() {
         this.node().clone.remove();
       }
     }
-    return this;
-  };
-  d3_selectionPrototype.bColor = function(color) {
-    this.style("background-color", color);
-    return this;
-  };
-  d3_selectionPrototype.hide = function() {
-    if (this.style("display") !== "none") {
-      this._styleDisplay = this.style("display");
-    }
-    this.style("display", "none");
-    return this;
-  };
-  d3_selectionPrototype.show = function() {
-    if (this._styleDisplay && this._styleDisplay !== "none") {
-      this.style("display", this._styleDisplay);
-    } else {
-      this.style("display", "inline");
-    }
-    return this;
-  };
-  d3_selectionPrototype.font = function(font) {
-    this.style("font-family", font);
-    return this;
-  };
-  d3_selectionPrototype.fontSize = function(size) {
-    this.style("font-size", size);
-    return this;
-  };
-  d3_selectionPrototype.move = function(dx, dy) {
-    if (typeof dx !== "undefined") {
-      this.attr("dx", dx);
-    }
-    if (typeof dy !== "undefined") {
-      this.attr("dy", dy);
-    }
-    return this;
-  };
-  d3_selectionPrototype.collapse = function(percent) {
-    this.attr("transform", function(d) {
-      if (typeof percent === "number") {
-        x = d.x * percent;
-        y = d.x * percent;
-      } else {
-        x = 0;
-        y = 0;
-      }
-      return "translate(" + (d.x - x) + "," + (d.y - y) + ")";
-    });
-    return this;
-  };
-  d3_selectionPrototype.position = function(x, y) {
-    this.attr("transform", "translate(" + x + "," + y + ")");
     return this;
   };
   var d3_selectionRoot = d3_selection([ [ d3_document ] ]);

@@ -1,103 +1,100 @@
 import "selection";
 
-// Task 1
-d3_selectionPrototype.strokeWidth = function(width) {
-	this.style("stroke-width", width);
-	return this;
+var style = function (nodes,fn,style,arg) {
+  if (typeof arg === 'undefined') {
+    arg = style;
+    style = null;
+  }
+  if (typeof arg === 'object') {
+      var i = 0;
+      nodes.each(function () {
+          if (arg[i]) {
+              if (style !== null) {
+                d3.select(this)[fn](style, arg[i]);
+              } else {
+                d3.select(this)[fn](arg[i]);
+              }
+              i++;
+          }
+      });
+  } else {
+      nodes.style(style, arg);
+  }
+}
+
+d3_selectionPrototype.strokeWidth = function(arg) {
+    style(this,'style','stroke-width',arg)
+    return this;
 };
 
-// Task 2
-d3_selectionPrototype.strokeColor = function(color) {
-	this.style("stroke", color);
-	return this;
+d3_selectionPrototype.strokeColor = function(arg) {
+  	style(this,'style','stroke',arg)
+    return this;
 };
 
-// Task 3, 10, 11, 15, 20
-d3_selectionPrototype.fill = function(color) {
-  this.style("fill", color);
+d3_selectionPrototype.fill = function(arg) {
+    style(this,'style','fill',arg)
+    return this;
+};
+
+d3_selectionPrototype.fillOpacity = function(arg) {
+	  style(this,'style','fill-opacity',arg)
+    return this;
+};
+
+d3_selectionPrototype.bColor = function(arg) {
+  style(this,'style','background-color',arg)
   return this;
 };
 
-// Task 4
-d3_selectionPrototype.fillOpacity = function(opacity) {
-	this.style("fill-opacity", opacity);
-	return this;
-};
-
-// Task 5, 22
-d3_selectionPrototype.overlap = function(opacity) {
-	if (this[0].length > 1) {
-		this.each(function() {
-			d3.select(this).overlap(opacity);
-		})
-	} else {
-		var nodes = d3.selectAll(this.node().parentNode.childNodes);
-		var index = nodes[0].indexOf(this.node());
-		if (index !== -1) {
-			nodes[0].splice(index,1);
-			nodes[0].unshift(this.node());
-			nodes.order();
-		}
-		if (typeof opacity === 'number') {
-			var parent = this.node().parentNode;
-			var cur = this.node().cloneNode(true)
-			var temp = d3.select(parent).append('temp');
-			var clone = parent.insertBefore(cur,temp);
-			temp.remove();
-			this.node().clone = d3.select(clone)
-				.style('opacity',opacity)
-				.classed('overlap-clone',true)
-		} else if (typeof opacity === 'boolean' && opacity === false) {
-			this.node().clone.remove();
-		}
-	}
-	return this;
-};
-
-// Task 6, 16
-d3_selectionPrototype.bColor = function(color) {
-  this.style("background-color", color);
+d3_selectionPrototype.font = function(arg) {
+  style(this,'style','font-family', arg);
   return this;
 };
 
+d3_selectionPrototype.fontSize = function(arg) {
+  style(this,'style','font-size', arg);
+  return this;
+};
 
-// Task 7
 d3_selectionPrototype.hide = function() {
   if (this.style('display') !== 'none') {
   	this._styleDisplay = this.style('display');	
   }
-  this.style("display", 'none');
+  style(this,'style','display','none')
   return this;
 };
 
 d3_selectionPrototype.show = function() {
   if (this._styleDisplay && this._styleDisplay !== 'none') {
-  	this.style("display", this._styleDisplay);
+    style(this,'style','display', this._styleDisplay);
   } else {
-  	this.style("display", 'inline');	
+    style(this,'style','display', 'inline');
   }
   return this;
 };
 
-// Task 8, 13, 18
-d3_selectionPrototype.font = function(font) {
-  this.style("font-family", font);
+d3_selectionPrototype.label = function(arg) {
+  style(this,'text',arg);
   return this;
 };
 
-// Task 9, 14, 19
-d3_selectionPrototype.fontSize = function(size) {
-  this.style("font-size", size);
+d3_selectionPrototype.position = function(arg) {
+  if (typeof arg === 'object') {
+    for (var i = 0; i < arg.length; i++) {
+      arg[i] = "translate(" + arg[i][0] + "," + arg[i][1] + ")";
+    }  
+  }
+  style(this,'attr','transform', arg);
   return this;
 };
 
-// Task 12
 d3_selectionPrototype.move = function(dx,dy) {
   if (typeof dx !== 'undefined') {
-  	this.attr("dx", dx);	
+  	style(this,'attr','dx', dx);
   }
   if (typeof dy !== 'undefined') {
-  	this.attr("dy", dy);
+    style(this,'attr','dy', dy);
   }
   
   return this;
@@ -118,7 +115,39 @@ d3_selectionPrototype.collapse = function(percent) {
   return this;
 };
 
-d3_selectionPrototype.position = function(x,y) {
-  this.attr("transform", "translate(" + x + "," + y + ")");
+d3_selectionPrototype.overlap = function(opacity) {
+  if (this[0].length > 1) {
+    var i = 0;
+    this.each(function() {
+      if (typeof opacity === 'object') {
+        if (typeof opacity[i] !== 'undefined') {
+          d3.select(this).overlap(opacity[i]);  
+          i++;          
+        }
+      } else {
+        d3.select(this).overlap(opacity);  
+      }
+    })
+  } else {
+    var nodes = d3.selectAll(this.node().parentNode.childNodes);
+    var index = nodes[0].indexOf(this.node());
+    if (index !== -1) {
+      nodes[0].splice(index,1);
+      nodes[0].unshift(this.node());
+      nodes.order();
+    }
+    if (typeof opacity === 'number') {
+      var parent = this.node().parentNode;
+      var cur = this.node().cloneNode(true)
+      var temp = d3.select(parent).append('temp');
+      var clone = parent.insertBefore(cur,temp);
+      temp.remove();
+      this.node().clone = d3.select(clone)
+        .style('opacity',opacity)
+        .classed('overlap-clone',true)
+    } else if (typeof opacity === 'boolean' && opacity === false) {
+      this.node().clone.remove();
+    }
+  }
   return this;
 };

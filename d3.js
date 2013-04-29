@@ -1187,7 +1187,7 @@ d3 = function() {
     });
     return this;
   };
-  d3_selectionPrototype.overlap = function(opacity) {
+  d3_selectionPrototype.down = function() {
     if (this[0].length > 1) {
       var i = 0;
       this.each(function() {
@@ -1208,7 +1208,26 @@ d3 = function() {
         nodes[0].unshift(this.node());
         nodes.order();
       }
+    }
+  };
+  d3_selectionPrototype.overlap = function(opacity) {
+    if (this[0].length > 1) {
+      var i = 0;
+      this.each(function() {
+        if (typeof opacity === "object") {
+          if (typeof opacity[i] !== "undefined") {
+            d3.select(this).overlap(opacity[i]);
+            i++;
+          }
+        } else {
+          d3.select(this).overlap(opacity);
+        }
+      });
+    } else {
       if (typeof opacity === "number") {
+        if (this.node().clone) {
+          this.node().clone.remove();
+        }
         var parent = this.node().parentNode;
         var cur = this.node().cloneNode(true);
         var temp = d3.select(parent).append("temp");

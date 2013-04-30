@@ -117,16 +117,8 @@ d3_selectionPrototype.collapse = function(percent) {
 
 d3_selectionPrototype.down = function() {
   if (this[0].length > 1) {
-    var i = 0;
     this.each(function() {
-      if (typeof opacity === 'object') {
-        if (typeof opacity[i] !== 'undefined') {
-          d3.select(this).overlap(opacity[i]);  
-          i++;          
-        }
-      } else {
-        d3.select(this).overlap(opacity);  
-      }
+      d3.select(this).down()
     })
   } else {
     var nodes = d3.selectAll(this.node().parentNode.childNodes);
@@ -135,7 +127,7 @@ d3_selectionPrototype.down = function() {
       nodes[0].splice(index,1);
       nodes[0].unshift(this.node());
       nodes.order();
-    }
+    }  
   }
 }
 

@@ -150,10 +150,8 @@ d3_selectionPrototype.overlap = function(opacity) {
         this.node().clone.remove();
       }
       var parent = this.node().parentNode;
-      var cur = this.node().cloneNode(true)
-      var temp = d3.select(parent).append('temp');
-      var clone = parent.insertBefore(cur,temp);
-      temp.remove();
+      var cur = this.node().cloneNode(true);
+      var clone = parent.appendChild(cur);
       this.node().clone = d3.select(clone)
         .style('opacity',opacity)
         .classed('overlap-clone',true)

@@ -1222,9 +1222,7 @@ d3 = function() {
         }
         var parent = this.node().parentNode;
         var cur = this.node().cloneNode(true);
-        var temp = d3.select(parent).append("temp");
-        var clone = parent.insertBefore(cur, temp);
-        temp.remove();
+        var clone = parent.appendChild(cur);
         this.node().clone = d3.select(clone).style("opacity", opacity).classed("overlap-clone", true);
       } else if (typeof opacity === "boolean" && opacity === false) {
         this.node().clone.remove();

@@ -7,7 +7,7 @@ var style = function (nodes,fn,style,arg) {
   }
   if (typeof arg === 'object') {
       var i = 0;
-      nodes.each(function () {
+      nodes.each(function (d) {
           if (arg[i]) {
               if (style !== null) {
                 d3.select(this)[fn](style, arg[i]);
@@ -81,6 +81,16 @@ d3_selectionPrototype.label = function(arg) {
 
 d3_selectionPrototype.position = function(arg) {
   if (typeof arg === 'object') {
+      var i = 0;
+      this.each(function (d) {
+          if (arg[i]) {
+              d.x = arg[i][0]
+              d.y = arg[i][1]
+              i++;
+          }
+      });
+  }
+  if (typeof arg === 'object') {
     for (var i = 0; i < arg.length; i++) {
       arg[i] = "translate(" + arg[i][0] + "," + arg[i][1] + ")";
     }  
@@ -131,17 +141,17 @@ d3_selectionPrototype.down = function() {
   }
 }
 
-d3_selectionPrototype.overlap = function(opacity) {
+d3_selectionPrototype.overlap = function(opacity,fn) {
   if (this[0].length > 1) {
     var i = 0;
     this.each(function() {
       if (typeof opacity === 'object') {
         if (typeof opacity[i] !== 'undefined') {
-          d3.select(this).overlap(opacity[i]);  
+          d3.select(this).overlap(opacity[i],fn);  
           i++;          
         }
       } else {
-        d3.select(this).overlap(opacity);  
+        d3.select(this).overlap(opacity,fn);  
       }
     })
   } else {
@@ -155,6 +165,11 @@ d3_selectionPrototype.overlap = function(opacity) {
       this.node().clone = d3.select(clone)
         .style('opacity',opacity)
         .classed('overlap-clone',true)
+      this.node().clone.node().parent = this;
+      if (fn) {
+        this.node().clone.data(this.data())
+        this.node().clone.call(fn)
+      }
     } else if (typeof opacity === 'boolean' && opacity === false) {
       this.node().clone.remove();
     }

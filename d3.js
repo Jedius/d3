@@ -1115,7 +1115,6 @@ d3 = function() {
             } else if (fn === "popOut") {
               var tlength = this.getComputedTextLength();
               var clength = el.data()[0].r * 2;
-              console.log(tlength, clength);
               if (typeof arg[i] === "number") {
                 if (clength - tlength <= arg[i]) {
                   el.attr("dy", clength / 2 + arg2[i] + "px");

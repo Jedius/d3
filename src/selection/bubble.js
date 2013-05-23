@@ -1,6 +1,6 @@
 import "selection";
 
-var style = function (nodes,fn,style,arg) {
+var style = function (nodes,fn,style,arg,arg2) {
   if (typeof arg === 'undefined') {
     arg = style;
     style = null;
@@ -12,7 +12,31 @@ var style = function (nodes,fn,style,arg) {
               if (style !== null) {
                 d3.select(this)[fn](style, arg[i]);
               } else {
-                d3.select(this)[fn](arg[i]);
+                var el = d3.select(this);
+                el[fn](arg[i]);
+                if (fn === 'text') {
+                    var data = el.data()[0];
+                    data.__label = arg[i];
+                    el.data(data);  
+                } else if (fn === 'percent') {
+                  if (arg[i]) {
+                    el.text(el.data()[0].__label + ' - ' + el.data()[0].percent*100+'%')
+                  } else {
+                    el.html(el.data()[0].__label)
+                  }
+                } else if (fn === 'popOut') {
+                  var tlength = this.getComputedTextLength();
+                  var clength = el.data()[0].r*2;
+                  console.log(tlength, clength);
+                  if (typeof arg[i] === 'number') {
+                      if (clength - tlength <= arg[i]) {
+                        el.attr('dy',clength/2+arg2[i]+'px')
+                      }
+                  } else {
+
+                  }
+                  
+                }
               }
               i++;
           }
@@ -29,6 +53,11 @@ d3_selectionPrototype.strokeWidth = function(arg) {
 
 d3_selectionPrototype.strokeColor = function(arg) {
   	style(this,'style','stroke',arg)
+    return this;
+};
+
+d3_selectionPrototype.strokeOpacity = function(arg) {
+    style(this,'style','stroke-opacity',arg)
     return this;
 };
 
@@ -76,6 +105,11 @@ d3_selectionPrototype.show = function() {
 
 d3_selectionPrototype.label = function(arg) {
   style(this,'text',arg);
+  return this;
+};
+
+d3_selectionPrototype.percent = function(arg) {
+  style(this,'percent',arg);
   return this;
 };
 
@@ -174,5 +208,10 @@ d3_selectionPrototype.overlap = function(opacity,fn) {
       this.node().clone.remove();
     }
   }
+  return this;
+};
+
+d3_selectionPrototype.popOut = function(arg,arg2) {
+  style(this,'popOut',arg,undefined,arg2);
   return this;
 };

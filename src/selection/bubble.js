@@ -19,12 +19,7 @@ var style = function (nodes,fn,style,arg,arg2) {
                     data.__label = arg[i];
                     el.data(data);  
                 } else if (fn === 'percent') {
-                  var name = '';
-                  if (el.data()[0].__label) {
-                    name = el.data()[0].__label;
-                  } else {
-                    name = el.data()[0].name;
-                  }
+                  var name = el.data()[0].__label || el.data()[0].name || el.data()[0].className || '';
                   if (arg[i]) {
                     el.text(name + ' - ' + el.data()[0].percent*100+'%')
                   } else {

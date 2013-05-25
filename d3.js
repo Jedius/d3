@@ -1107,10 +1107,16 @@ d3 = function() {
               data.__label = arg[i];
               el.data(data);
             } else if (fn === "percent") {
-              if (arg[i]) {
-                el.text(el.data()[0].__label + " - " + el.data()[0].percent * 100 + "%");
+              var name = "";
+              if (el.data()[0].__label) {
+                name = el.data()[0].__label;
               } else {
-                el.html(el.data()[0].__label);
+                name = el.data()[0].name;
+              }
+              if (arg[i]) {
+                el.text(name + " - " + el.data()[0].percent * 100 + "%");
+              } else {
+                el.html(name);
               }
             } else if (fn === "popOut") {
               var tlength = this.getComputedTextLength();

@@ -1109,7 +1109,7 @@ d3 = function() {
             } else if (fn === "percent") {
               var name = el.data()[0].__label || el.data()[0].name || el.data()[0].className || "";
               if (arg[i]) {
-                el.text(name + " - " + el.data()[0].percent * 100 + "%");
+                el.text(name + " - " + el.data()[0].percent + "%");
               } else {
                 el.html(name);
               }

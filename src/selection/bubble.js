@@ -21,7 +21,7 @@ var style = function (nodes,fn,style,arg,arg2) {
                 } else if (fn === 'percent') {
                   var name = el.data()[0].__label || el.data()[0].name || el.data()[0].className || '';
                   if (arg[i]) {
-                    el.text(name + ' - ' + el.data()[0].percent*100+'%')
+                    el.text(name + ' - ' + el.data()[0].percent + '%')
                   } else {
                     el.html(name)
                   }
@@ -215,3 +215,4 @@ d3_selectionPrototype.popOut = function(arg,arg2) {
   style(this,'popOut',arg,undefined,arg2);
   return this;
 };
+

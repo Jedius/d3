@@ -19,18 +19,27 @@ var style = function (nodes,fn,style,arg,arg2) {
                     data.__label = arg[i];
                     el.data(data);  
                 } else if (fn === 'percent') {
-                  var name = el.data()[0].__label || el.data()[0].name || el.data()[0].className || '';
                   if (arg[i]) {
-                    el.text(name + ' - ' + el.data()[0].percent + '%')
-                  } else {
-                    el.html(name)
+                    var t_el = el.append('text')
+                      .text(el.data()[0].percent + '%')
+                    var dy = t_el.node().getBBox().height
+                    t_el.attr('dy',dy+4+'px')
                   }
                 } else if (fn === 'popOut') {
-                  var tlength = this.getComputedTextLength();
+                  var t_el = d3.select(this).select('text')
+                  var tlength = t_el.node().getComputedTextLength();
                   var clength = el.data()[0].r*2;
+                  
                   if (typeof arg[i] === 'number') {
                       if (clength - tlength <= arg[i]) {
-                        el.attr('dy',clength/2+arg2[i]+'px')
+                        var dy = el.data()[0].r + el.node().getBBox().height/2
+                        var p_el = d3.select(t_el.node().nextSibling);
+                        if (p_el.node()) {
+                          var _dy = p_el.node().getBBox().height  
+                          p_el.attr('dy',dy+_dy+'px')
+                        }
+                        t_el.attr('dy',dy+'px')
+                        
                       }
                   } else {
 

@@ -1,5 +1,69 @@
 import "selection";
 
+var percent = function (el,show) {
+  if (show) {
+    var _dy = parseFloat(el.select(':last-child').attr('dy')) || 0;
+    var t_el = el.append('text')
+      .text(el.data()[0].percent + '%')
+    var dy = t_el.node().getBBox().height
+    t_el.attr('dy',_dy+dy+'px')
+  }
+}
+
+var popOut = function(el,offset) {
+  var clength = el.data()[0].r*2;
+  // var t_parent = d3.select(t_el.node().parentNode);
+  el.selectAll('text').each(function(){
+    var t_el = d3.select(this)
+    
+    var tlength = t_el.node().getComputedTextLength();
+    
+    
+    if (typeof offset === 'number') {
+        if (clength - tlength <= offset) {
+          var text = t_el.text().split(' ');
+          if (text[1]) {
+            // create new line
+            t_el.text(text[0])
+            var dy = el.node().getBBox().height;
+            var _text = ''
+            text.forEach(function(t,i){if (i != 0) _text += t})
+            el.append('text')
+              .text(_text)
+              .attr('dy',dy+4+'px')
+            popOut(el,offset)
+          } else {
+            // move all outside
+            el.selectAll('text').each(function(d){
+              var _el = d3.select(this);
+              var dy = d.r + parseFloat(_el.attr('dy')) + _el.node().getBBox().height/2 + 10
+              _el.attr('dy',dy+'px')
+            })
+            
+
+          }
+
+        }
+    } else {
+
+    }
+  })
+}
+
+var execute = function (nodes,self,i,fn,style,arg) {
+  var el = d3.select(self);
+  el[fn](arg[i]);
+  if (fn === 'text') {
+      var data = el.data()[0];
+      data.__label = arg[i];
+      el.data(data);  
+  } else if (fn === 'percent') {
+    percent(el,arg[i])
+  } else if (fn === 'popOut') {
+    popOut(el,arg[i])
+  }
+}
+
 var style = function (nodes,fn,style,arg,arg2) {
   if (typeof arg === 'undefined') {
     arg = style;
@@ -7,45 +71,12 @@ var style = function (nodes,fn,style,arg,arg2) {
   }
   if (typeof arg === 'object') {
       var i = 0;
-      nodes.each(function (d) {
+      nodes.each(function () {
           if (arg[i]) {
               if (style !== null) {
                 d3.select(this)[fn](style, arg[i]);
               } else {
-                var el = d3.select(this);
-                el[fn](arg[i]);
-                if (fn === 'text') {
-                    var data = el.data()[0];
-                    data.__label = arg[i];
-                    el.data(data);  
-                } else if (fn === 'percent') {
-                  if (arg[i]) {
-                    var t_el = el.append('text')
-                      .text(el.data()[0].percent + '%')
-                    var dy = t_el.node().getBBox().height
-                    t_el.attr('dy',dy+4+'px')
-                  }
-                } else if (fn === 'popOut') {
-                  var t_el = d3.select(this).select('text')
-                  var tlength = t_el.node().getComputedTextLength();
-                  var clength = el.data()[0].r*2;
-                  
-                  if (typeof arg[i] === 'number') {
-                      if (clength - tlength <= arg[i]) {
-                        var dy = el.data()[0].r + el.node().getBBox().height/2
-                        var p_el = d3.select(t_el.node().nextSibling);
-                        if (p_el.node()) {
-                          var _dy = p_el.node().getBBox().height  
-                          p_el.attr('dy',dy+_dy+'px')
-                        }
-                        t_el.attr('dy',dy+'px')
-                        
-                      }
-                  } else {
-
-                  }
-                  
-                }
+                execute(nodes,this,i,fn,style,arg,arg2)
               }
               i++;
           }
